@@ -45,7 +45,8 @@ class AnimalNameResource {
     @GetMapping(path = "/random")
     public String name(@RequestHeader HttpHeaders headers) {
         String name = animalNames.get(random.nextInt(animalNames.size()));
-        return name;
+        throw new RuntimeException("Invalid Operations.");
+        // return name;
     }
 }
 
