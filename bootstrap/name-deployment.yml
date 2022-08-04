@@ -1,0 +1,133 @@
+---
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: animal-name-service
+  labels:
+    app: animal-name-service
+spec:
+  ports:
+    - port: 9000
+      name: http
+  selector:
+    app: animal-name-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: animal-name-service
+  labels:
+    app: animal-name-service
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: animal-name-service
+  template:
+    metadata:
+      labels:
+        app: animal-name-service
+        version: v1
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - name: app
+          image: allen88/animal-name-service:0.0.1
+          env:
+            - name: SCIENTIST_SERVICE_PREFIX_URL
+              value: http://scientist-name-service:8090
+            - name: JAVA_OPTS
+              value: "-Dotel.resource.attributes=service.name=animal-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger-collector.istio-system.svc:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3 -Dotel.javaagent.debug=true"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scientist-name-service
+  labels:
+    app: scientist-name-service
+spec:
+  ports:
+    - port: 8090
+      name: http
+  selector:
+    app: scientist-name-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scientist-name-service
+  labels:
+    app: scientist-name-service
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scientist-name-service
+  template:
+    metadata:
+      labels:
+        app: scientist-name-service
+        version: v1
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - name: app
+          image: allen88/scientist-name-service:0.0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+          env:
+            - name: JAVA_OPTS
+              value: "-Dotel.resource.attributes=service.name=scientist-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger-collector.istio-system.svc:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3 -Dotel.javaagent.debug=true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: name-generator-service
+  labels:
+    app: name-generator-service
+spec:
+  ports:
+    - port: 8080
+      name: http
+  selector:
+    app: name-generator-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: name-generator-service
+  labels:
+    app: name-generator-service
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: name-generator-service
+  template:
+    metadata:
+      labels:
+        app: name-generator-service
+        version: v1
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - name: app
+          image: allen88/name-generator-service:0.0.1
+          env:
+            - name: SCIENTIST_SERVICE_PREFIX_URL
+              value: http://scientist-name-service:8090
+            - name: ANIMAL_SERVICE_PREFIX_URL
+              value: http://animal-name-service:9000
+            - name: JAVA_OPTS
+              value: "-Dotel.resource.attributes=service.name=name-generator-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger-collector.istio-system.svc:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3 -Dotel.javaagent.debug=true"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080

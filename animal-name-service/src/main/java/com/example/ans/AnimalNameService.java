@@ -1,7 +1,14 @@
 package com.example.ans;
 
+import static strman.Strman.toKebabCase;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +25,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 @SpringBootApplication
+@EnableFeignClients
 public class AnimalNameService {
 
     public static void main(String[] args) {
@@ -26,12 +34,24 @@ public class AnimalNameService {
 
 }
 
+@FeignClient(name = "scientist-service-client", url = "${scientist.service.prefix.url}")
+interface ScientistServiceClient {
+
+    @GetMapping("/api/v1/scientists/random")
+    String randomScientistName();
+
+}
+
 @RestController
 @RequestMapping("/api/v1/animals")
 class AnimalNameResource {
+    private final Logger LOGGER = LoggerFactory.getLogger(AnimalNameResource.class);
 
     private final List<String> animalNames;
     private Random random;
+
+    @Autowired
+    private ScientistServiceClient scientistServiceClient;
 
 
     public AnimalNameResource() throws IOException {
@@ -45,8 +65,15 @@ class AnimalNameResource {
     @GetMapping(path = "/random")
     public String name(@RequestHeader HttpHeaders headers) {
         String name = animalNames.get(random.nextInt(animalNames.size()));
-        throw new RuntimeException("Invalid Operations.");
-        // return name;
+        String scientist = scientistServiceClient.randomScientistName();
+
+        name = toKebabCase(scientist) + "-" + toKebabCase(name);
+
+        System.out.println("===========================================");
+        System.out.println("HttpHeaders: " + headers);
+        System.out.println("===========================================");
+        // throw new RuntimeException("Invalid Operations.");
+        return name;
     }
 }
 

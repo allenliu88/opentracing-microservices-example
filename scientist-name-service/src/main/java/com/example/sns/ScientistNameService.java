@@ -1,5 +1,7 @@
 package com.example.sns;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.io.ClassPathResource;
@@ -30,6 +32,7 @@ public class ScientistNameService {
 @RestController
 @RequestMapping("/api/v1/scientists")
 class ScientistNameResource {
+    private final Logger LOGGER = LoggerFactory.getLogger(ScientistNameResource.class);
 
     private final List<String> scientistsNames;
     private Random random;
@@ -45,6 +48,9 @@ class ScientistNameResource {
     @GetMapping(path = "/random")
     public String name(@RequestHeader HttpHeaders headers) {
         String name = scientistsNames.get(random.nextInt(scientistsNames.size()));
+        System.out.println("===========================================");
+        System.out.println("HttpHeaders: " + headers);
+        System.out.println("===========================================");
         return name;
     }
 }

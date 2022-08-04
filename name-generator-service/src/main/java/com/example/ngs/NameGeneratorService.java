@@ -1,11 +1,15 @@
 package com.example.ngs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,18 +46,22 @@ interface AnimalServiceClient {
 @RestController
 @RequestMapping("/api/v1/names")
 class NameResource {
+    private final Logger LOGGER = LoggerFactory.getLogger(NameResource.class);
 
     @Autowired
     private AnimalServiceClient animalServiceClient;
     @Autowired
     private ScientistServiceClient scientistServiceClient;
 
-
     @GetMapping(path = "/random")
-    public String name() throws Exception {
+    public String name(@RequestHeader HttpHeaders headers) throws Exception {
         String animal = animalServiceClient.randomAnimalName();
-        String scientist = scientistServiceClient.randomScientistName();
-        String name = toKebabCase(scientist) + "-" + toKebabCase(animal);
+        String name = animal;
+        // String scientist = scientistServiceClient.randomScientistName();
+        // String name = toKebabCase(scientist) + "-" + toKebabCase(animal);
+        System.out.println("===========================================");
+        System.out.println("HttpHeaders: " + headers);
+        System.out.println("===========================================");
         return name;
     }
 
