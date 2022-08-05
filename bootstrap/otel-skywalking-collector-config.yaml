@@ -8,7 +8,7 @@ receivers:
 
 exporters:
   jaeger:
-    endpoint: localhost:14250
+    endpoint: "$EXPORTERS_JAEGER_ENDPOINT"
     tls:
       insecure: true
 
