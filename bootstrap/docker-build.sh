@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd bootstrap
+cd ~/Customize/Share/Git/00-opensource/8-blog/opentracing-microservices-example/bootstrap
 
 docker image build --platform linux/amd64 -t allen88/animal-name-service:0.0.1 -f ./Dockerfile-Animal .
 docker image build --platform linux/amd64 -t allen88/scientist-name-service:0.0.1 -f ./Dockerfile-Scientist .

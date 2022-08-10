@@ -40,7 +40,7 @@ spec:
         command:
         - /bin/sh
         - -c
-        - "cp /tmp/opentelemetry-javaagent.jar /agent/opentelemetry-javaagent.jar && cp /tmp/hskp-opentelemetry-java-instrumentation-ext-0.1.0-all.jar /agent/hskp-opentelemetry-java-instrumentation-ext-0.1.0-all.jar"
+        - "cp /tmp/opentelemetry-javaagent.jar /agent/opentelemetry-javaagent.jar && cp /tmp/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar /agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar"
         volumeMounts:
         - name: agent
           mountPath: "/agent"
@@ -52,7 +52,7 @@ spec:
         - name: SCIENTIST_SERVICE_PREFIX_URL
           value: http://scientist-name-service:8090
         - name: JAVA_OPTS
-          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=animal-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger-collector.istio-system.svc:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/hskp-opentelemetry-java-instrumentation-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
+          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=animal-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger-collector.istio-system.svc:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
         ports:
         - containerPort: 9000
         volumeMounts:
@@ -102,7 +102,7 @@ spec:
         command:
         - /bin/sh
         - -c
-        - "cp /tmp/opentelemetry-javaagent.jar /agent/opentelemetry-javaagent.jar && cp /tmp/hskp-opentelemetry-java-instrumentation-ext-0.1.0-all.jar /agent/hskp-opentelemetry-java-instrumentation-ext-0.1.0-all.jar"
+        - "cp /tmp/opentelemetry-javaagent.jar /agent/opentelemetry-javaagent.jar && cp /tmp/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar /agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar"
         volumeMounts:
         - name: agent
           mountPath: "/agent" # <-- change the mount path not to overwrite your .jar
@@ -114,7 +114,7 @@ spec:
         - containerPort: 8090
         env:
         - name: JAVA_OPTS
-          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=scientist-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger-collector.istio-system.svc:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/hskp-opentelemetry-java-instrumentation-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
+          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=scientist-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger-collector.istio-system.svc:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
         volumeMounts:
         - name: agent
           mountPath: "/agent" # <-- change the mount path not to overwrite your .jar
@@ -162,7 +162,7 @@ spec:
         command:
         - /bin/sh
         - -c
-        - "cp /tmp/opentelemetry-javaagent.jar /agent/opentelemetry-javaagent.jar && cp /tmp/hskp-opentelemetry-java-instrumentation-ext-0.1.0-all.jar /agent/hskp-opentelemetry-java-instrumentation-ext-0.1.0-all.jar"
+        - "cp /tmp/opentelemetry-javaagent.jar /agent/opentelemetry-javaagent.jar && cp /tmp/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar /agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar"
         volumeMounts:
         - name: agent
           mountPath: "/agent" # <-- change the mount path not to overwrite your .jar
@@ -176,7 +176,7 @@ spec:
         - name: ANIMAL_SERVICE_PREFIX_URL
           value: http://animal-name-service:9000
         - name: JAVA_OPTS
-          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=name-generator-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger-collector.istio-system.svc:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/hskp-opentelemetry-java-instrumentation-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
+          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=name-generator-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger-collector.istio-system.svc:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
         ports:
         - containerPort: 8080
         volumeMounts:

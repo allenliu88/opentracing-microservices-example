@@ -14,6 +14,8 @@ istioctl kube-inject -f name-deployment-ext.yml | kubectl apply -f -
 
 istioctl kube-inject -f name-deployment-skywalking.yml | kubectl apply -f -
 
+curl -H 'X-Custom-Id: 7890' -H 'X-Custom-Name: Custom Name' -H 'X-Custom-Omit: Omit Header' -v http://172.23.16.213:30710/api/v1/names/random
+
 ## Others
 # COPY opentelemetry-javaagent.jar /opentelemetry-javaagent.jar
 
