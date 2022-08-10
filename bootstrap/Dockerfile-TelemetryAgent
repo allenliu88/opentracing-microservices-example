@@ -3,6 +3,9 @@ FROM alpine:3.14
 ## opentelemetry-javaagent 1.16.0
 COPY opentelemetry-javaagent.jar /tmp/opentelemetry-javaagent.jar
 
+## opentelemetry-javaagent ext
+COPY hskp-opentelemetry-java-instrumentation-ext-0.1.0-all.jar /tmp/hskp-opentelemetry-java-instrumentation-ext-0.1.0-all.jar
+
 ## apache-skywalking-java-agent-8.11.0.tgz
 COPY apache-skywalking-java-agent-8.11.0.tgz /tmp/apache-skywalking-java-agent-8.11.0.tgz
 
