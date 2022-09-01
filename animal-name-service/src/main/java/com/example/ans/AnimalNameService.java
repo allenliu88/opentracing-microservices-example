@@ -72,8 +72,8 @@ class AnimalNameResource {
         System.out.println("===========================================");
         System.out.println("HttpHeaders: " + headers);
         System.out.println("===========================================");
-        // throw new RuntimeException("Invalid Operations.");
-        return name;
+        throw new RuntimeException("Invalid Operations.");
+        // return name;
     }
 }
 
