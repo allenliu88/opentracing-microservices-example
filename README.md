@@ -22,12 +22,12 @@ curl -H 'X-Custom-Id: 7890' -H 'X-Custom-Name: Custom Name' -H 'X-Custom-Omit: O
 ```
 
 ## 特性列表
-### 基本OTEL接入配置
+### 一、基本OTEL接入配置
 ```shell
 istioctl kube-inject -f name-deployment.yml | kubectl apply -n allen -f -
 ```
 
-### Skywalking Agent接入配置
+### 二、Skywalking Agent接入配置
 ```shell
 ## 注意
 ## Dockerfile-OTELSkywalkingCollector：包含了Collector及其配置逻辑otel-skywalking-collector-config.yaml
@@ -38,7 +38,7 @@ istioctl kube-inject -f name-deployment-skywalking.yml | kubectl apply -n allen 
 kubectl apply -n allen -f skywalking-tracer-telemetry.yaml
 ```
 
-### Loki接入配置
+### 三、Loki接入配置
 ```shell
 ## Loki Collector，含其配置otel-loki-collector-config.yaml
 kubectl apply -n -f loki-collector-deployment.yml
@@ -47,11 +47,11 @@ kubectl apply -n -f loki-collector-deployment.yml
 kubectl apply -n -f loki-logs-telemetry.yaml
 ```
 
-### 增加Logger MDC配置验证
+### 四、增加Logger MDC配置验证
 参考[Logger MDC auto-instrumentation](https://github.com/open-telemetry/opentelemetry-java-instrumentation/blob/main/docs/logger-mdc-instrumentation.md)
 
 注意：
-暂时无法通过`-Dlogging.pattern.level='trace_id=%mdc{trace_id} span_id=%mdc{span_id} trace_flags=%mdc{trace_flags} %5p'`参数设置，该种方式会报错：
+**暂时无法通过**`-Dlogging.pattern.level='trace_id=%mdc{trace_id} span_id=%mdc{span_id} trace_flags=%mdc{trace_flags} %5p'`参数设置，该种方式会报错：
 ```shell
 [otel.javaagent 2022-10-25 11:22:25:094 +0800] [main] DEBUG io.opentelemetry.javaagent.tooling.AgentInstaller$TransformLoggingListener - Transformed com.ibm.tools.attach.target.AttachHandler -- null
 [otel.javaagent 2022-10-25 11:22:25:104 +0800] [main] DEBUG io.opentelemetry.javaagent.tooling.AgentInstaller$TransformLoggingListener - Transformed com.ibm.tools.attach.target.AttachHandler$teardownHook -- null
@@ -59,7 +59,7 @@ kubectl apply -n -f loki-logs-telemetry.yaml
 Error: Could not find or load main class span_id=%mdc{span_id}
 ```
 
-只能通过环境变量的方式配置，例如：
+**只能通过环境变量的方式配置**，例如：
 ```yaml
         env:
         - name: LOGGING_PATTERN_LEVEL
