@@ -8,13 +8,17 @@ docker run -it allen88/otel-skywalking-collector:0.0.1 env
 docker run -d allen88/otel-skywalking-collector:0.0.1
 
 cd ~/Customize/Share/Git/00-opensource/8-blog/opentracing-microservices-example/bootstrap
-istioctl kube-inject -f name-deployment.yml | kubectl apply -f -
 
-istioctl kube-inject -f name-deployment-ext.yml | kubectl apply -f -
+## 生成工作负载资源
+istioctl kube-inject -f name-deployment.yml | kubectl apply -n allen -f -
+istioctl kube-inject -f name-deployment-ext.yml | kubectl apply -n allen -f -
+istioctl kube-inject -f name-deployment-skywalking.yml | kubectl apply -n allen -f -
 
-istioctl kube-inject -f name-deployment-skywalking.yml | kubectl apply -f -
+## 生成网关配置
+kubectl apply -n allen -f name-gateway.yml
 
-curl -H 'X-Custom-Id: 7890' -H 'X-Custom-Name: Custom Name' -H 'X-Custom-Omit: Omit Header' -v http://172.23.16.213:30710/api/v1/names/random
+## 请求验证
+curl -H 'X-Custom-Id: 7890' -H 'X-Custom-Name: Custom Name' -H 'X-Custom-Omit: Omit Header' -v http://172.23.16.213:30893/api/v1/names/random
 
 ## Others
 # COPY opentelemetry-javaagent.jar /opentelemetry-javaagent.jar
