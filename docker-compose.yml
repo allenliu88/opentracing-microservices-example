@@ -1,26 +1,65 @@
 version: "3.4"
 services:
   animal-name-service:
-    image: com.example/animal-name-service:0.1.0
+    container_name: animal-name-service
+    image: allen88/animal-name-service:0.0.1
     restart: on-failure
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
       - SPRING_APPLICATION_NAME=animal-name-service
+      - SCIENTIST_SERVICE_PREFIX_URL=http://scientist-name-service:8090
+      - JAVA_OPTS=-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=animal-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3 -Dotel.javaagent.debug=true
+      - OTEL_TRACES_SAMPLER=jaeger_remote
+      - OTEL_TRACES_SAMPLER_ARG=endpoint=http://jaeger:14250,pollingIntervalMs=5000,initialSamplingRate=0.25
+    volumes:
+    - "./bootstrap/opentelemetry-javaagent.jar:/agent/opentelemetry-javaagent.jar"
   scientist-name-service:
-    image: com.example/scientist-name-service:0.1.0
+    container_name: scientist-name-service
+    image: allen88/scientist-name-service:0.0.1
     restart: on-failure
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
       - SPRING_APPLICATION_NAME=scientist-name-service
+      - JAVA_OPTS=-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=scientist-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3 -Dotel.javaagent.debug=true
+      - OTEL_TRACES_SAMPLER=jaeger_remote
+      - OTEL_TRACES_SAMPLER_ARG=endpoint=http://jaeger:14250,pollingIntervalMs=5000,initialSamplingRate=0.25
+    volumes:
+    - "./bootstrap/opentelemetry-javaagent.jar:/agent/opentelemetry-javaagent.jar"
   name-generator-service:
-    image: com.example/name-generator-service:0.1.0
+    container_name: name-generator-service
+    image: allen88/name-generator-service:0.0.1
     restart: on-failure
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
       - SPRING_APPLICATION_NAME=name-generator-service
+      - SCIENTIST_SERVICE_PREFIX_URL=http://scientist-name-service:8090
+      - ANIMAL_SERVICE_PREFIX_URL=http://animal-name-service:9000
+      - JAVA_OPTS=-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=name-generator-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3 -Dotel.javaagent.debug=true
+      - OTEL_TRACES_SAMPLER=rule_based_routing_sampler
+      - OTEL_TRACES_SAMPLER_ARG=http.target:/actuator.*,/health.*;http.target:/foo
+      - OTEL_JAVAAGENT_EXTENSIONS=/agent/opentelemetry-samplers.jar
+    volumes:
+    - "./bootstrap/opentelemetry-javaagent.jar:/agent/opentelemetry-javaagent.jar"
+    - "./bootstrap/opentelemetry-samplers-1.31.0-alpha.jar:/agent/opentelemetry-samplers.jar"
     ports:
       - "8080:8080"
   jaeger:
-    image: jaegertracing/all-in-one:1.17
+    container_name: jaeger
+    image: jaegertracing/all-in-one:1.48
+    command:
+    - --sampling.strategies-file
+    - /opt/jaeger-strategies.json
+    restart: on-failure
+    environment:
+    - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+    - COLLECTOR_OTLP_ENABLED=true
+    volumes:
+    - "./bootstrap/jaeger-strategies.json:/opt/jaeger-strategies.json"
     ports:
-      - 9090:16686
+    - "6831:6831/udp"
+    - "6832:6832/udp"
+    - "5778:5778"
+    - "16686:16686"
+    - "4317:4317"
+    - "4318:4318"
+    - "14250:14250"
+    - "14268:14268"
+    - "14269:14269"
+    - "9411:9411"

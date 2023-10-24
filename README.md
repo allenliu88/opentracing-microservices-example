@@ -3,6 +3,22 @@
 This is source code for blog [Jaeger Integration With Spring Boot Application](https://medium.com/xebia-engineering/jaeger-integration-with-spring-boot-application-3c6ec4a96a6f).
 
 ## 使用指南
+
+### Docker Compose
+
+```shell
+cd opentracing-microservices-example
+docker-compose up -d
+
+## 请求验证
+curl -H 'X-Custom-Id: 7890' -H 'X-Custom-Name: Custom Name' -H 'X-Custom-Omit: Omit Header' -v http://localhost:8080/api/v1/names/random
+curl -v http://localhost:8080/actuator/health
+```
+
+**调用链地址**：
+http://localhost:16686
+
+### Kubernetes
 ```shell
 cd opentracing-microservices-example/bootstrap
 
