@@ -10,6 +10,7 @@ services:
       - JAVA_OPTS=-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=animal-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3 -Dotel.javaagent.debug=true
       - OTEL_TRACES_SAMPLER=jaeger_remote
       - OTEL_TRACES_SAMPLER_ARG=endpoint=http://jaeger:14250,pollingIntervalMs=5000,initialSamplingRate=0.25
+      - OTEL_BSP_SCHEDULE_DELAY=90000
     volumes:
     - "./bootstrap/opentelemetry-javaagent.jar:/agent/opentelemetry-javaagent.jar"
   scientist-name-service:
@@ -21,6 +22,7 @@ services:
       - JAVA_OPTS=-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=scientist-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3 -Dotel.javaagent.debug=true
       - OTEL_TRACES_SAMPLER=jaeger_remote
       - OTEL_TRACES_SAMPLER_ARG=endpoint=http://jaeger:14250,pollingIntervalMs=5000,initialSamplingRate=0.25
+      - OTEL_BSP_SCHEDULE_DELAY=90000
     volumes:
     - "./bootstrap/opentelemetry-javaagent.jar:/agent/opentelemetry-javaagent.jar"
   name-generator-service:
@@ -35,11 +37,14 @@ services:
       - OTEL_TRACES_SAMPLER=rule_based_routing_sampler
       - OTEL_TRACES_SAMPLER_ARG=http.target:/actuator.*,/health.*;http.target:/foo
       - OTEL_JAVAAGENT_EXTENSIONS=/agent/opentelemetry-samplers.jar
+      - OTEL_METRICS_EXPORTER=prometheus
+      - OTEL_BSP_SCHEDULE_DELAY=90000
     volumes:
     - "./bootstrap/opentelemetry-javaagent.jar:/agent/opentelemetry-javaagent.jar"
     - "./bootstrap/opentelemetry-samplers-1.31.0-alpha.jar:/agent/opentelemetry-samplers.jar"
     ports:
       - "8080:8080"
+      - "9464:9464"
   jaeger:
     container_name: jaeger
     image: jaegertracing/all-in-one:1.48
