@@ -1,0 +1,193 @@
+---
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: animal-name-service
+  labels:
+    app: animal-name-service
+spec:
+  ports:
+    - port: 9000
+      name: http
+  selector:
+    app: animal-name-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: animal-name-service
+  labels:
+    app: animal-name-service
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: animal-name-service
+  template:
+    metadata:
+      labels:
+        app: animal-name-service
+        version: v1
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      initContainers:
+      - name: init-agent
+        image: allen88/opentelemetry-agent:0.0.1
+        imagePullPolicy: Always
+        command:
+        - /bin/sh
+        - -c
+        - "cp /tmp/opentelemetry-javaagent.jar /agent/opentelemetry-javaagent.jar && cp /tmp/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar /agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar"
+        volumeMounts:
+        - name: agent
+          mountPath: "/agent"
+      containers:
+      - name: app
+        image: allen88/animal-name-service:0.0.1
+        imagePullPolicy: Always
+        env:
+        - name: SCIENTIST_SERVICE_PREFIX_URL
+          value: http://scientist-name-service:8090
+        - name: LOGGING_PATTERN_LEVEL
+          value: trace_id=%mdc{trace_id} span_id=%mdc{span_id} trace_flags=%mdc{trace_flags} %5p
+        - name: JAVA_OPTS
+          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=animal-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger-collector.istio-system.svc:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - name: agent
+          mountPath: "/agent"
+      volumes:
+      - name: agent
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scientist-name-service
+  labels:
+    app: scientist-name-service
+spec:
+  ports:
+    - port: 8090
+      name: http
+  selector:
+    app: scientist-name-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scientist-name-service
+  labels:
+    app: scientist-name-service
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scientist-name-service
+  template:
+    metadata:
+      labels:
+        app: scientist-name-service
+        version: v1
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      initContainers:
+      - name: init-agent
+        image: allen88/opentelemetry-agent:0.0.1
+        imagePullPolicy: Always
+        command:
+        - /bin/sh
+        - -c
+        - "cp /tmp/opentelemetry-javaagent.jar /agent/opentelemetry-javaagent.jar && cp /tmp/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar /agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar"
+        volumeMounts:
+        - name: agent
+          mountPath: "/agent" # <-- change the mount path not to overwrite your .jar
+      containers:
+      - name: app
+        image: allen88/scientist-name-service:0.0.1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8090
+        env:
+        - name: LOGGING_PATTERN_LEVEL
+          value: trace_id=%mdc{trace_id} span_id=%mdc{span_id} trace_flags=%mdc{trace_flags} %5p
+        - name: JAVA_OPTS
+          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=scientist-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger-collector.istio-system.svc:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
+        volumeMounts:
+        - name: agent
+          mountPath: "/agent" # <-- change the mount path not to overwrite your .jar
+      volumes:
+      - name: agent
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: name-generator-service
+  labels:
+    app: name-generator-service
+spec:
+  ports:
+    - port: 8080
+      name: http
+  selector:
+    app: name-generator-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: name-generator-service
+  labels:
+    app: name-generator-service
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: name-generator-service
+  template:
+    metadata:
+      labels:
+        app: name-generator-service
+        version: v1
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      initContainers:
+      - name: init-agent
+        image: allen88/opentelemetry-agent:0.0.1
+        imagePullPolicy: Always
+        command:
+        - /bin/sh
+        - -c
+        - "cp /tmp/opentelemetry-javaagent.jar /agent/opentelemetry-javaagent.jar && cp /tmp/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar /agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar"
+        volumeMounts:
+        - name: agent
+          mountPath: "/agent" # <-- change the mount path not to overwrite your .jar
+      containers:
+      - name: app
+        image: allen88/name-generator-service:0.0.1
+        imagePullPolicy: Always
+        env:
+        - name: SCIENTIST_SERVICE_PREFIX_URL
+          value: http://scientist-name-service:8090
+        - name: ANIMAL_SERVICE_PREFIX_URL
+          value: http://animal-name-service:9000
+        - name: LOGGING_PATTERN_LEVEL
+          value: trace_id=%mdc{trace_id} span_id=%mdc{span_id} trace_flags=%mdc{trace_flags} %5p
+        - name: JAVA_OPTS
+          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=name-generator-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://jaeger-collector.istio-system.svc:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: agent
+          mountPath: "/agent" # <-- change the mount path not to overwrite your .jar
+      volumes:
+      - name: agent
+        emptyDir: {}

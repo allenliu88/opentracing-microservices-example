@@ -1,0 +1,14 @@
+FROM alpine:3.14
+
+## opentelemetry-javaagent 1.16.0
+COPY ../artifact/opentelemetry-javaagent.jar /tmp/opentelemetry-javaagent.jar
+
+## opentelemetry-javaagent ext
+COPY ../artifact/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar /tmp/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar
+
+## apache-skywalking-java-agent-8.11.0.tgz
+COPY ../artifact/apache-skywalking-java-agent-8.11.0.tgz /tmp/apache-skywalking-java-agent-8.11.0.tgz
+
+RUN tar zxvf  /tmp/apache-skywalking-java-agent-8.11.0.tgz -C /tmp/
+
+CMD ["/bin/sh"]

@@ -1,0 +1,31 @@
+receivers:
+  zipkin:
+
+exporters:
+  jaeger:
+    endpoint: "$EXPORTERS_JAEGER_ENDPOINT"
+    tls:
+      insecure: true
+
+## 参考：https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/v0.70.0/processor/tailsamplingprocessor
+## 注意，不同版本配置可能不同！
+processors:
+  tail_sampling:
+    decision_wait: 10s
+    num_traces: 100
+    expected_new_traces_per_sec: 10
+    policies:
+      [
+        {
+          name: probabilistic-001,
+          type: probabilistic,
+          probabilistic: {sampling_percentage: 10}
+        },
+      ]
+
+service:
+  pipelines:
+    traces:
+      receivers: [zipkin]
+      processors: [tail_sampling]
+      exporters: [jaeger]

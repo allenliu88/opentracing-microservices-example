@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-jaeger-sampling-collector
+  namespace: istio-system
+  labels:
+    app: otel-jaeger-sampling-collector
+spec:
+  ports:
+  - port: 9411
+    name: http
+  selector:
+    app: otel-jaeger-sampling-collector
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-jaeger-sampling-collector
+  namespace: istio-system
+  labels:
+    app: otel-jaeger-sampling-collector
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otel-jaeger-sampling-collector
+  template:
+    metadata:
+      labels:
+        app: otel-jaeger-sampling-collector
+        version: v1
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - name: app
+        image: allen88/otel-jaeger-sampling-collector:0.1.0
+        imagePullPolicy: Always
+        env:
+        - name: EXPORTERS_JAEGER_ENDPOINT
+          value: "jaeger-collector.istio-system.svc:14250"
+        ports:
+        - containerPort: 14250
+          name: grpc
+---
