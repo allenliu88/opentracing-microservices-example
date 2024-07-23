@@ -40,6 +40,11 @@ interface AnimalServiceClient {
     @GetMapping("/api/v1/animals/random")
     String randomAnimalName();
 
+    @GetMapping("/api/v1/animals/error")
+    String animalError();
+
+    @GetMapping("/api/v1/animals/latency")
+    String animalLatency();
 }
 
 
@@ -65,5 +70,24 @@ class NameResource {
         return name;
     }
 
+    @GetMapping(path = "/error")
+    public String error(@RequestHeader HttpHeaders headers) throws Exception {
+        String animal = animalServiceClient.animalError();
+        String name = animal;
+        System.out.println("===========================================");
+        System.out.println("HttpHeaders: " + headers);
+        System.out.println("===========================================");
+        return name;
+    }
+
+    @GetMapping(path = "/latency")
+    public String latency(@RequestHeader HttpHeaders headers) throws Exception {
+        String animal = animalServiceClient.animalLatency();
+        String name = animal;
+        System.out.println("===========================================");
+        System.out.println("HttpHeaders: " + headers);
+        System.out.println("===========================================");
+        return name;
+    }
 
 }

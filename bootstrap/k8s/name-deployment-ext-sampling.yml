@@ -136,6 +136,8 @@ spec:
   ports:
     - port: 8080
       name: http
+    - port: 8081
+      name: mgmt
   selector:
     app: name-generator-service
 ---
@@ -185,6 +187,9 @@ spec:
           value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=name-generator-service -Dotel.traces.exporter=zipkin -Dotel.exporter.zipkin.endpoint=http://otel-jaeger-sampling-collector.istio-system:9411/api/v2/spans -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
         ports:
         - containerPort: 8080
+          name: http
+        - containerPort: 8081
+          name: mgmt
         volumeMounts:
         - name: agent
           mountPath: "/agent" # <-- change the mount path not to overwrite your .jar

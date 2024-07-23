@@ -1,5 +1,83 @@
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-jaeger-sampling-collector
+  namespace: istio-system
+  labels:
+    app: otel-jaeger-sampling-collector
+data:
+  otel-jaeger-sampling-collector-config.yaml: |
+    receivers:
+      zipkin:
+      jaeger/defaults:
+        protocols:
+          grpc:
+          thrift_http:
+          thrift_compact:
+          thrift_binary:
+    exporters:
+      logging:
+        loglevel: debug
+      jaeger:
+        endpoint: "$EXPORTERS_JAEGER_ENDPOINT"
+        tls:
+          insecure: true
+    ## 参考：https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/v0.70.0/processor/tailsamplingprocessor
+    ## 注意，不同版本配置可能不同！
+    processors:
+      tail_sampling:
+        decision_wait: 10s
+        num_traces: 50000
+        expected_new_traces_per_sec: 10
+        policies:
+          [
+            {
+              name: status_code-1,
+              type: status_code,
+              status_code: {status_codes: [ERROR]}
+            },
+            {
+              name: latency-1,
+              type: latency,
+              latency: {threshold_ms: 5000}
+            },
+            {
+              name: and-policy-1,
+              type: and,
+              and: {
+                and_sub_policy:
+                  [
+                    {
+                      name: probabilistic-1,
+                      type: probabilistic,
+                      probabilistic: {sampling_percentage: 10}
+                    },
+                    {
+                      name: span_count-1,
+                      type: span_count,
+                      span_count: {min_spans: 3}
+                    },
+                    {
+                      name: string_attribute-1,
+                      type: string_attribute,
+                      string_attribute: {key: http.route, values: [\/actuator\/health], enabled_regex_matching: true, invert_match: true}
+                    },
+                  ]
+              }
+            },
+          ]
+    service:
+      telemetry:
+        logs:
+          level: "debug"
+      pipelines:
+        traces:
+          receivers: [zipkin, jaeger/defaults]
+          processors: [tail_sampling]
+          exporters: [logging, jaeger]
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: otel-jaeger-sampling-collector
@@ -44,4 +122,12 @@ spec:
         ports:
         - containerPort: 14250
           name: grpc
+        volumeMounts:
+        - name: config-volume
+          mountPath: "/u01/config"
+          readOnly: true
+      volumes:
+      - name: config-volume
+        configMap:
+          name: otel-jaeger-sampling-collector
 ---

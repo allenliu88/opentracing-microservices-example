@@ -4,10 +4,10 @@ RUN mkdir /u01
 
 ## https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.70.0
 COPY ../artifact/otelcol-contrib_0.70.0_linux_arm64.tar.gz /u01/otelcol-contrib_0.70.0_linux_arm64.tar.gz
-COPY ../config/otel-jaeger-sampling-collector-config.yaml /u01/otel-jaeger-sampling-collector-config.yaml
+## COPY ../config/otel-jaeger-sampling-collector-config.yaml /u01/config/otel-jaeger-sampling-collector-config.yaml
 RUN tar zxvf /u01/otelcol-contrib_0.70.0_linux_arm64.tar.gz -C /u01
 ENV EXPORTERS_JAEGER_ENDPOINT=localhost:14250
 
 WORKDIR /u01
 ## CMD ["sleep", "3600"]
-CMD ["./otelcol-contrib", "--config=./otel-jaeger-sampling-collector-config.yaml"]
+CMD ["./otelcol-contrib", "--config=/u01/config/otel-jaeger-sampling-collector-config.yaml"]

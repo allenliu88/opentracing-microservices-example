@@ -40,6 +40,11 @@ interface ScientistServiceClient {
     @GetMapping("/api/v1/scientists/random")
     String randomScientistName();
 
+    @GetMapping("/api/v1/scientists/error")
+    String scientistError();
+
+    @GetMapping("/api/v1/scientists/latency")
+    String scientistLatency();
 }
 
 @RestController
@@ -66,6 +71,34 @@ class AnimalNameResource {
     public String name(@RequestHeader HttpHeaders headers) {
         String name = animalNames.get(random.nextInt(animalNames.size()));
         String scientist = scientistServiceClient.randomScientistName();
+
+        name = toKebabCase(scientist) + "-" + toKebabCase(name);
+
+        System.out.println("===========================================");
+        System.out.println("HttpHeaders: " + headers);
+        System.out.println("===========================================");
+        // throw new RuntimeException("Invalid Operations.");
+        return name;
+    }
+
+    @GetMapping(path = "/error")
+    public String error(@RequestHeader HttpHeaders headers) {
+        String name = animalNames.get(random.nextInt(animalNames.size()));
+        String scientist = scientistServiceClient.scientistError();
+
+        name = toKebabCase(scientist) + "-" + toKebabCase(name);
+
+        System.out.println("===========================================");
+        System.out.println("HttpHeaders: " + headers);
+        System.out.println("===========================================");
+        // throw new RuntimeException("Invalid Operations.");
+        return name;
+    }
+
+    @GetMapping(path = "/latency")
+    public String latency(@RequestHeader HttpHeaders headers) {
+        String name = animalNames.get(random.nextInt(animalNames.size()));
+        String scientist = scientistServiceClient.scientistLatency();
 
         name = toKebabCase(scientist) + "-" + toKebabCase(name);
 

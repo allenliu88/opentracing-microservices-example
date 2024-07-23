@@ -31,3 +31,11 @@ spec:
         host: name-generator-service
         port:
           number: 8080
+  - match:
+    - uri:
+        prefix: /actuator
+    route:
+    - destination:
+        host: name-generator-service
+        port:
+          number: 8081

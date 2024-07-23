@@ -53,4 +53,23 @@ class ScientistNameResource {
         System.out.println("===========================================");
         return name;
     }
+
+    @GetMapping(path = "/error")
+    public String error(@RequestHeader HttpHeaders headers) {
+        throw new RuntimeException("Invalid Error Operations.");
+    }
+
+    @GetMapping(path = "/latency")
+    public String latency(@RequestHeader HttpHeaders headers) {
+        String name = scientistsNames.get(random.nextInt(scientistsNames.size()));
+        System.out.println("===========================================");
+        System.out.println("HttpHeaders: " + headers);
+        System.out.println("===========================================");
+        try {
+            Thread.sleep(10000L);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return name;
+    }
 }
