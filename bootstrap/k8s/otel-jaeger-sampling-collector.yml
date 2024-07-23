@@ -54,14 +54,14 @@ data:
                       probabilistic: {sampling_percentage: 10}
                     },
                     {
-                      name: span_count-1,
-                      type: span_count,
-                      span_count: {min_spans: 3}
-                    },
-                    {
                       name: string_attribute-1,
                       type: string_attribute,
-                      string_attribute: {key: http.route, values: [\/actuator\/health], enabled_regex_matching: true, invert_match: true}
+                      string_attribute: {key: http.route, values: ["/actuator/health", ".*actuator.*"], enabled_regex_matching: true, invert_match: true}
+                    },
+                    {
+                      name: string_attribute-2,
+                      type: string_attribute,
+                      string_attribute: {key: http.path, values: ["/actuator/health", ".*actuator.*"], enabled_regex_matching: true, invert_match: true}
                     },
                   ]
               }
