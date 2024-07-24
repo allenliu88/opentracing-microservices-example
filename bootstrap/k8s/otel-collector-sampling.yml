@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: otel-jaeger-sampling-collector
+  name: otel-collector-sampling
   namespace: istio-system
   labels:
-    app: otel-jaeger-sampling-collector
+    app: otel-collector-sampling
 data:
-  otel-jaeger-sampling-collector-config.yaml: |
+  otel-collector-sampling-config.yaml: |
     receivers:
       zipkin:
       jaeger/defaults:
@@ -80,48 +80,52 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: otel-jaeger-sampling-collector
+  name: otel-collector-sampling
   namespace: istio-system
   labels:
-    app: otel-jaeger-sampling-collector
+    app: otel-collector-sampling
 spec:
   ports:
   - port: 9411
-    name: http
+    name: http-zipkin
+  - port: 14250
+    name: grpc-jaeger
   selector:
-    app: otel-jaeger-sampling-collector
+    app: otel-collector-sampling
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: otel-jaeger-sampling-collector
+  name: otel-collector-sampling
   namespace: istio-system
   labels:
-    app: otel-jaeger-sampling-collector
+    app: otel-collector-sampling
     version: v1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: otel-jaeger-sampling-collector
+      app: otel-collector-sampling
   template:
     metadata:
       labels:
-        app: otel-jaeger-sampling-collector
+        app: otel-collector-sampling
         version: v1
       annotations:
         sidecar.istio.io/inject: "false"
     spec:
       containers:
       - name: app
-        image: allen88/otel-jaeger-sampling-collector:0.1.0
+        image: allen88/otel-collector-sampling:0.1.0
         imagePullPolicy: Always
         env:
         - name: EXPORTERS_JAEGER_ENDPOINT
           value: "jaeger-collector.istio-system.svc:14250"
         ports:
         - containerPort: 14250
-          name: grpc
+          name: grpc-jaeger
+        - containerPort: 9411
+          name: http-zipkin
         volumeMounts:
         - name: config-volume
           mountPath: "/u01/config"
@@ -129,5 +133,5 @@ spec:
       volumes:
       - name: config-volume
         configMap:
-          name: otel-jaeger-sampling-collector
+          name: otel-collector-sampling
 ---

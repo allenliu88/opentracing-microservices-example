@@ -20,12 +20,13 @@ istioctl kube-inject -f k8s/name-deployment-ext-sampling.yml | kubectl delete -n
 istioctl kube-inject -f k8s/name-deployment-ext-sampling.yml | kubectl apply -n allen -f -
 kubectl get po -n allen
 
-kubectl delete -n istio-system -f k8s/otel-jaeger-sampling-collector.yml
-kubectl apply -n istio-system -f k8s/otel-jaeger-sampling-collector.yml
-kubectl get po -n istio-system
-kubectl logs -f -n istio-system deploy/otel-jaeger-sampling-collector
+kubectl delete -n istio-system -f k8s/otel-collector-sampling.yml
+kubectl apply -n istio-system -f k8s/otel-collector-sampling.yml
+kubectl get -n istio-system -f k8s/otel-collector-sampling.yml
+kubectl logs -f -n istio-system deploy/otel-collector-sampling
 
 ## 生成网关配置
+kubectl delete -n allen -f k8s/name-gateway.yml
 kubectl apply -n allen -f k8s/name-gateway.yml
 
 ## 请求验证

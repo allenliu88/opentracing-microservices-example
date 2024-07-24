@@ -54,7 +54,7 @@ spec:
         - name: LOGGING_PATTERN_LEVEL
           value: trace_id=%mdc{trace_id} span_id=%mdc{span_id} trace_flags=%mdc{trace_flags} %5p
         - name: JAVA_OPTS
-          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=animal-name-service -Dotel.traces.exporter=zipkin -Dotel.exporter.zipkin.endpoint=http://otel-jaeger-sampling-collector.istio-system:9411/api/v2/spans -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
+          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=animal-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://otel-collector-sampling.istio-system:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
         ports:
         - containerPort: 9000
         volumeMounts:
@@ -118,7 +118,7 @@ spec:
         - name: LOGGING_PATTERN_LEVEL
           value: trace_id=%mdc{trace_id} span_id=%mdc{span_id} trace_flags=%mdc{trace_flags} %5p
         - name: JAVA_OPTS
-          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=scientist-name-service -Dotel.traces.exporter=zipkin -Dotel.exporter.zipkin.endpoint=http://otel-jaeger-sampling-collector.istio-system:9411/api/v2/spans -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
+          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=scientist-name-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://otel-collector-sampling.istio-system:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
         volumeMounts:
         - name: agent
           mountPath: "/agent" # <-- change the mount path not to overwrite your .jar
@@ -184,7 +184,7 @@ spec:
         - name: LOGGING_PATTERN_LEVEL
           value: trace_id=%mdc{trace_id} span_id=%mdc{span_id} trace_flags=%mdc{trace_flags} %5p
         - name: JAVA_OPTS
-          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=name-generator-service -Dotel.traces.exporter=zipkin -Dotel.exporter.zipkin.endpoint=http://otel-jaeger-sampling-collector.istio-system:9411/api/v2/spans -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
+          value: "-javaagent:/agent/opentelemetry-javaagent.jar -Dotel.resource.attributes=service.name=name-generator-service -Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://otel-collector-sampling.istio-system:14250 -Dotel.exporter.jaeger.timeout=10000 -Dotel.propagators=b3multi-ext -Dotel.javaagent.debug=true -Dotel.javaagent.extensions=/agent/opentelemetry-java-instrumentation-propagator-ext-0.1.0-all.jar -Dotel.instrumentation.propagate.http.request.headers=x-ot-span-context,X-Custom-Id,X-Custom-Name -Dotel.instrumentation.http.capture-headers.client.request=X-Request-Id -Dotel.instrumentation.http.capture-headers.server.request=X-Request-Id"
         ports:
         - containerPort: 8080
           name: http
